@@ -20,5 +20,10 @@ class ProductService {
     const result = asyncHandler(this.MongooseServiceInstance.create(product));
     return result;
   }
+
+  get() {
+    const results = asyncHandler(this.MongooseServiceInstance.find());
+    return results;
+  }
 }
 module.exports = ProductService;
