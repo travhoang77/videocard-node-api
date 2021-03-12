@@ -5,6 +5,7 @@ const asyncHandler = require("../../middlewares/async");
 const {
   createProduct,
   getProducts,
+  getProductById
 } = require("../../controllers/Product/index");
 
 let router = express.Router();
@@ -57,26 +58,11 @@ router.get("/", (req, res) => {
   getProducts(req, res);
 });
 
+router.get("/:id", (req, res) => {
+  getProductById(req, res);
+});
+
 router.post("/", (req, res) => {
-  // const result = validateProduct(req.body);
-
-  // if (result.error) {
-  //   res.status(400).send(result.error);
-  //   return;
-  // }
-
-  // const product = {
-  //   id: products.length + 1,
-  //   name: req.body.name,
-  //   subtitle: req.body.subtitle,
-  //   type: req.body.type,
-  //   chipset: req.body.chipset,
-  //   maker: req.body.maker,
-  //   brand: req.body.brand,
-  //   quantity: req.body.quantity,
-  //   tags: req.body.tags,
-  // };
-  // products.push(product);
   createProduct(req, res);
 });
 

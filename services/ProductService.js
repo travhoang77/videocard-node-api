@@ -25,5 +25,20 @@ class ProductService {
     const results = asyncHandler(this.MongooseServiceInstance.find());
     return results;
   }
+  /**
+   * @param  {} product
+   * update exisiting product in DB
+   * @return success value and result
+   */
+  update(product) {
+    const result = asyncHandler(this.MongooseServiceInstance.update(product.id, product));
+    return result;
+  }
+
+  findById(id) {
+    const result = asyncHandler(this.MongooseServiceInstance.findById(id));
+    if (!result) throw error ;
+    return result;
+  }
 }
 module.exports = ProductService;
