@@ -5,6 +5,7 @@ const logger = require("./services/Logger");
 const mongooseOptions = {
   useUnifiedTopology: true,
   useNewUrlParser: true,
+  useFindAndModify: false,
 };
 
 mongoose.Promise = global.Promise;

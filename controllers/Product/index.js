@@ -1,8 +1,14 @@
 const ProductService = require("../../services/ProductService");
 const ProductServiceInstance = new ProductService();
-const asyncControllerHandler = require("../../middlewares/asyncController");
+const { findById } = require("../../models/Product");
 
-module.exports = { createProduct, getProducts, getProductById };
+module.exports = {
+  createProduct,
+  getProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+};
 
 async function createProduct(req, res) {
   try {
@@ -23,15 +29,31 @@ async function getProducts(req, res) {
 }
 
 async function getProductById(req, res) {
-  try{
-    const product = await ProductServiceInstance.findById(req.params.id);
-    console.log(product);
+  try {
+    const product = await ProductServiceInstance.find(req.params.id);
     return res.send(product);
-  } catch(err) {
+  } catch (err) {
     res.status(500).send(err);
   }
 }
 
 async function updateProduct(req, res) {
+  try {
+    const product = await ProductServiceInstance.update(
+      req.params.id,
+      req.body
+    );
+    return res.send(product);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
 
+async function deleteProduct(req, res) {
+  try {
+    const product = await ProductServiceInstance.delete(req.params.id);
+    return res.send(product);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 }

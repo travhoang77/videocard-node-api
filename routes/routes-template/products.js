@@ -5,7 +5,9 @@ const asyncHandler = require("../../middlewares/async");
 const {
   createProduct,
   getProducts,
-  getProductById
+  getProductById,
+  updateProduct,
+  deleteProduct,
 } = require("../../controllers/Product/index");
 
 let router = express.Router();
@@ -66,50 +68,13 @@ router.post("/", (req, res) => {
   createProduct(req, res);
 });
 
-router.put(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    const product = products.find((p) => p.id === parseInt(req.params.id));
-    if (!product) {
-      res.status(404).send("The product with the given ID was not found");
-      return;
-    }
+router.put("/:id", (req, res) => {
+  updateProduct(req, res);
+});
 
-    const result = validateProduct(req.body);
-
-    if (result.error) {
-      res.status(400).send(result.error);
-      return;
-    }
-
-    product.name = req.body.name;
-    product.subtitle = req.body.subtitle;
-    product.type = req.body.type;
-    product.chipset = req.body.chipset;
-    product.maker = req.body.maker;
-    product.brand = req.body.brand;
-    product.quantity = req.body.quantity;
-    tags = req.body.tags;
-
-    res.send(product);
-  })
-);
-
-router.delete(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    const product = products.find((p) => p.id === parseInt(req.params.id));
-    if (!product) {
-      res.status(404).send("The product with the given ID was not found");
-      return;
-    }
-
-    const index = products.indexOf(product);
-    products.splice(index, 1);
-
-    res.send(products);
-  })
-);
+router.delete("/:id", (req, res) => {
+  deleteProduct(req, res);
+});
 
 function validateProduct(product) {
   const productSchema = Joi.object({

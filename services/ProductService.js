@@ -30,14 +30,20 @@ class ProductService {
    * update exisiting product in DB
    * @return success value and result
    */
-  update(product) {
-    const result = asyncHandler(this.MongooseServiceInstance.update(product.id, product));
+  update(id, product) {
+    const result = asyncHandler(
+      this.MongooseServiceInstance.update(id, product)
+    );
     return result;
   }
 
-  findById(id) {
+  find(id) {
     const result = asyncHandler(this.MongooseServiceInstance.findById(id));
-    if (!result) throw error ;
+    return result;
+  }
+
+  delete(id) {
+    const result = asyncHandler(this.MongooseServiceInstance.delete(id));
     return result;
   }
 }
