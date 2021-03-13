@@ -59,3 +59,6 @@ typings/
 
 # dotidea folders used by webstorm
 .idea/
+
+#config
+config/index.js
