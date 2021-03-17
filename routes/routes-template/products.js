@@ -1,7 +1,5 @@
 const express = require("express");
-const Joi = require("joi");
-const Product = require("../../models/Product");
-const asyncHandler = require("../../middlewares/async");
+
 const {
   createProduct,
   getProducts,
@@ -75,20 +73,5 @@ router.put("/:id", (req, res) => {
 router.delete("/:id", (req, res) => {
   deleteProduct(req, res);
 });
-
-function validateProduct(product) {
-  const productSchema = Joi.object({
-    name: Joi.string().min(3).max(50).required(),
-    subtitle: Joi.string(),
-    type: Joi.string(),
-    chipset: Joi.string(),
-    maker: Joi.string(),
-    brand: Joi.string(),
-    quantity: Joi.number().integer(),
-    tags: Joi.array().items(Joi.string()),
-  });
-
-  return productSchema.validate(product);
-}
 
 module.exports = router;

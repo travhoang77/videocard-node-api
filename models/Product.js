@@ -1,52 +1,9 @@
 const { string } = require("joi");
 const mongoose = require("mongoose");
+const Joigoose = require("joigoose")(mongoose);
+const Product = require("../middlewares/validators/Product");
 
-const ProductSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-
-  subtitle: {
-    type: String,
-  },
-
-  type: {
-    type: String,
-  },
-
-  chipset: {
-    type: String,
-  },
-
-  maker: {
-    type: String,
-  },
-
-  brand: {
-    type: String,
-  },
-
-  quantity: {
-    type: Number,
-  },
-
-  price: {
-    type: Number,
-  },
-
-  imgUrl: {
-    type: String,
-  },
-
-  rating: {
-    type: Number,
-    default: 0,
-  },
-
-  tags: [String],
-
-  date: { type: Date, default: Date.now },
-});
+//Schema and Model is derived from Validator
+const ProductSchema = new mongoose.Schema(Joigoose.convert(Product.validator));
 
 module.exports = mongoose.model("Products", ProductSchema);

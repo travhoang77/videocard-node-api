@@ -6,6 +6,7 @@ const mongooseOptions = {
   useUnifiedTopology: true,
   useNewUrlParser: true,
   useFindAndModify: false,
+  useCreateIndex: true,
 };
 
 mongoose.Promise = global.Promise;

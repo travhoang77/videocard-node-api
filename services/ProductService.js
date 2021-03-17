@@ -2,7 +2,7 @@ const MongooseService = require("./MongooseService");
 const ProductModel = require("../models/Product");
 const asyncHandler = require("../middlewares/asyncService");
 /**
- * @description Create an instance of ProductService
+ * @description Create an instance of ProductService with basic CRUD services
  */
 class ProductService {
   /**
@@ -20,7 +20,9 @@ class ProductService {
     const result = asyncHandler(this.MongooseServiceInstance.create(product));
     return result;
   }
-
+  /**
+   * Get all products
+   */
   get() {
     const results = asyncHandler(this.MongooseServiceInstance.find());
     return results;
@@ -36,12 +38,18 @@ class ProductService {
     );
     return result;
   }
-
+  /**
+   * @param  {} id
+   * return Product with given id
+   */
   find(id) {
     const result = asyncHandler(this.MongooseServiceInstance.findById(id));
     return result;
   }
-
+  /**
+   * @param  {} id
+   * Delete Product with given id
+   */
   delete(id) {
     const result = asyncHandler(this.MongooseServiceInstance.delete(id));
     return result;

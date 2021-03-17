@@ -9,7 +9,10 @@ module.exports = {
   updateProduct,
   deleteProduct,
 };
-
+/**
+ * @param  {} req
+ * @param  {} res
+ */
 async function createProduct(req, res) {
   try {
     const product = await ProductServiceInstance.create(req.body);

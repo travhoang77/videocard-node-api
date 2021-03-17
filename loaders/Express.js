@@ -29,8 +29,12 @@ class ExpressLoader {
     app.use(bodyParser.json({ limit: "20mb" }));
 
     //Import Routes
+    const authRoutes = require("../routes/routes-template/auth");
     const productRoutes = require("../routes/routes-template/products");
+    const userRoutes = require("../routes/routes-template/users");
+    app.use("/api/auth", authRoutes);
     app.use("/api/products", productRoutes);
+    app.use("/api/users", userRoutes);
 
     // Pass app to routes
     routes(app);
