@@ -4,7 +4,13 @@ const { findById } = require("../../models/User");
 const _ = require("lodash");
 const bcrpyt = require("bcrypt");
 
-module.exports = { createUser, getUsers, getUserById, getUserByEmail };
+module.exports = {
+  createUser,
+  getUsers,
+  getUserById,
+  getUserByEmail,
+  authenticate,
+};
 
 /**
  * @param  {} req
@@ -44,6 +50,25 @@ async function getUserByEmail(req, res) {
   try {
     const user = await UserServiceInstance.findByEmail(req.body.email);
     return user.success ? res.send(omitPassword(user)) : res.send(user);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+async function authenticate(req, res) {
+  try {
+    const user = await UserServiceInstance.findByEmail(req.body.email);
+    if (user.success) {
+      const authenticated = await bcrpyt.compareSync(
+        req.body.password,
+        user.body.password
+      );
+
+      return authenticated
+        ? res.send(omitPassword(user))
+        : res.status(401).send("Unauthorized user");
+    }
+    return res.send(user);
   } catch (err) {
     res.status(500).send(err);
   }
