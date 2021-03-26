@@ -1,14 +1,16 @@
 const express = require("express");
+const { validateToken } = require("../../middlewares/token");
 
 const {
   createUser,
   getUsers,
   getUserById,
+  deleteUserById,
 } = require("../../controllers/User/index");
 
 let router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/", validateToken, (req, res) => {
   getUsers(req, res);
 });
 
@@ -18,6 +20,10 @@ router.get("/:id", (req, res) => {
 
 router.post("/", (req, res) => {
   createUser(req, res);
+});
+
+router.delete("/:id", (req, res) => {
+  deleteUserById(req, res);
 });
 
 module.exports = router;

@@ -10,6 +10,7 @@ module.exports = {
   getUserById,
   getUserByEmail,
   authenticate,
+  deleteUserById,
 };
 
 /**
@@ -20,9 +21,12 @@ async function createUser(req, res) {
   try {
     const salt = await bcrpyt.genSaltSync(10);
     req.body.password = await bcrpyt.hashSync(req.body.password, salt);
-    const user = await UserServiceInstance.create(req.body);
+    const result = await UserServiceInstance.create(req.body);
 
-    return res.send(omitPassword(user));
+    return res.send({
+      success: result.success,
+      body: omitPassword(result.body),
+    });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -31,7 +35,11 @@ async function createUser(req, res) {
 async function getUsers(req, res) {
   try {
     const users = await UserServiceInstance.get();
-    return res.send(users);
+    let results = { success: true, body: [] };
+    users.body.map((b) => {
+      results.body.push(omitPassword(b));
+    });
+    return res.send(results);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -39,8 +47,10 @@ async function getUsers(req, res) {
 
 async function getUserById(req, res) {
   try {
-    const user = await UserServiceInstance.find(req.params.id);
-    return res.send(omitPassword(user));
+    const result = await UserServiceInstance.find(req.params.id);
+    return result.success
+      ? res.send({ success: result.success, body: omitPassword(result.body) })
+      : res.send({ success: false, error: "User not found" });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -48,8 +58,10 @@ async function getUserById(req, res) {
 
 async function getUserByEmail(req, res) {
   try {
-    const user = await UserServiceInstance.findByEmail(req.body.email);
-    return user.success ? res.send(omitPassword(user)) : res.send(user);
+    const result = await UserServiceInstance.findByEmail(req.body.email);
+    return result.success
+      ? res.send({ success: result.success, body: omitPassword(result.body) })
+      : res.send(user);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -57,30 +69,48 @@ async function getUserByEmail(req, res) {
 
 async function authenticate(req, res) {
   try {
-    const user = await UserServiceInstance.findByEmail(req.body.email);
-    if (user.success) {
+    const result = await UserServiceInstance.findByEmail(req.body.email);
+
+    if (result.success) {
       const authenticated = await bcrpyt.compareSync(
         req.body.password,
-        user.body.password
+        result.body.password
       );
 
-      return authenticated
-        ? res.send(omitPassword(user))
-        : res.status(401).send("Unauthorized user");
+      if (authenticated) {
+        const user = await UserServiceInstance.asignToken(result.body);
+        user.body = omitPassword(user.body);
+        return res
+          .header("authorization", user.body.access_tokens[0])
+          .send(user);
+      } else
+        return res
+          .status(401)
+          .send({ success: false, error: "Unauthorized user" });
     }
-    return res.send(user);
+    return res.send(result);
   } catch (err) {
     res.status(500).send(err);
   }
 }
 
+async function deleteUserById(req, res) {
+  try {
+    const result = await UserServiceInstance.delete(req.params.id);
+    result.success
+      ? res.send({ success: result.success, body: omitPassword(result.body) })
+      : res.send(result);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
 function omitPassword(user) {
-  user.body = _.pick(user.body, [
+  user = _.pick(user, [
     "email",
     "firstname",
     "lastname",
     "date",
-    "access_token",
+    "access_tokens",
     "birth_year",
     "_id",
     "__v",

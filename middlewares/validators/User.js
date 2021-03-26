@@ -14,7 +14,7 @@ const validator = Joi.object({
 
   lastname: Joi.string().alphanum().max(100),
 
-  access_token: [Joi.string(), Joi.number()],
+  access_tokens: Joi.array().items(Joi.string()),
 
   birth_year: Joi.number()
     .integer()

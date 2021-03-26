@@ -1,6 +1,9 @@
 const MongooseService = require("./MongooseService");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 const asyncHandler = require("../middlewares/asyncService");
+const _ = require("lodash");
+const config = require("../config");
 
 /**
  * @description Create an instance of UserService with basic CRUD services
@@ -64,5 +67,21 @@ class UserService {
     const result = asyncHandler(this.MongooseServiceInstance.delete(id));
     return result;
   }
+
+  asignToken(user) {
+    const token = jwt.sign(this.#createPayload(user), config.secret);
+
+    user.access_tokens != null
+      ? user.access_tokens.push(token)
+      : (user.access_tokens = [token]);
+
+    return asyncHandler(this.MongooseServiceInstance.update(user._id, user));
+  }
+
+  #createPayload = (user) => {
+    user = _.pick(user, ["_id", "email"]);
+    user.timestamp = Date.now();
+    return user;
+  };
 }
 module.exports = UserService;
