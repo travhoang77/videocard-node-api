@@ -8,6 +8,8 @@ const {
   deleteProduct,
 } = require("../../controllers/Product/index");
 
+const { validateToken } = require("../../middlewares/token");
+
 let router = express.Router();
 
 // const products = [
@@ -62,15 +64,15 @@ router.get("/:id", (req, res) => {
   getProductById(req, res);
 });
 
-router.post("/", (req, res) => {
+router.post("/", validateToken, (req, res) => {
   createProduct(req, res);
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validateToken, (req, res) => {
   updateProduct(req, res);
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validateToken, (req, res) => {
   deleteProduct(req, res);
 });
 

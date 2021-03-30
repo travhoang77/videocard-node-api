@@ -1,8 +1,10 @@
 const UserService = require("../../services/UserService");
 const UserServiceInstance = new UserService();
 const { findById } = require("../../models/User");
-const _ = require("lodash");
+const { pick, remove } = require("lodash");
 const bcrpyt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const config = require("../../config");
 
 module.exports = {
   createUser,
@@ -11,6 +13,7 @@ module.exports = {
   getUserByEmail,
   authenticate,
   deleteUserById,
+  logOff,
 };
 
 /**
@@ -104,8 +107,39 @@ async function deleteUserById(req, res) {
     res.status(500).send(err);
   }
 }
+// Need to wrap in Transaction
+// Log off user by removing its token and then updating it
+async function logOff(req, res) {
+  try {
+    const token =
+      req.headers && req.headers.authorization !== undefined
+        ? req.headers.authorization
+        : req.query.appToken || req.params.appToken || req.body.appToken;
+
+    const decode = jwt.verify(token, config.secret);
+
+    const result = await UserServiceInstance.find(decode._id);
+
+    result.body.access_tokens = remove(result.body.access_tokens, token);
+
+    const updated_result = await UserServiceInstance.update(
+      result.body._id,
+      result.body
+    );
+
+    updated_result.success
+      ? res.send({
+          success: updated_result.success,
+          body: omitPassword(updated_result.body),
+        })
+      : res.send(update_result);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
 function omitPassword(user) {
-  user = _.pick(user, [
+  user = pick(user, [
     "email",
     "firstname",
     "lastname",
