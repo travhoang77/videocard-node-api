@@ -120,7 +120,10 @@ async function logOff(req, res) {
 
     const result = await UserServiceInstance.find(decode._id);
 
-    result.body.access_tokens = remove(result.body.access_tokens, token);
+    result.body.access_tokens = removeItemOnce(
+      result.body.access_tokens,
+      token
+    );
 
     const updated_result = await UserServiceInstance.update(
       result.body._id,
@@ -136,6 +139,14 @@ async function logOff(req, res) {
   } catch (err) {
     res.status(500).send(err);
   }
+}
+
+function removeItemOnce(arr, value) {
+  var index = arr.indexOf(value);
+  if (index > -1) {
+    arr.splice(index, 1);
+  }
+  return arr;
 }
 
 function omitPassword(user) {
