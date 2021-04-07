@@ -1,11 +1,19 @@
 const express = require("express");
 const { validateToken } = require("../../middlewares/token");
-const { authenticate, logOff } = require("../../controllers/User");
+const {
+  authenticate,
+  logOff,
+  checkEmailExists,
+} = require("../../controllers/User");
 
 let router = express.Router();
 
 router.post("/", (req, res) => {
   authenticate(req, res);
+});
+
+router.get("/:email", (req, res) => {
+  checkEmailExists(req, res);
 });
 
 router.post("/signout", validateToken, (req, res) => {

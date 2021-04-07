@@ -11,6 +11,7 @@ module.exports = {
   getUsers,
   getUserById,
   getUserByEmail,
+  checkEmailExists,
   authenticate,
   deleteUserById,
   logOff,
@@ -65,6 +66,18 @@ async function getUserByEmail(req, res) {
     return result.success
       ? res.send({ success: result.success, body: omitPassword(result.body) })
       : res.send(user);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+async function checkEmailExists(req, res) {
+  try {
+    console.log(req.params.email);
+    const result = await UserServiceInstance.findByEmail(req.params.email);
+    return result.success
+      ? res.send({ success: result.success, message: "Email exists" })
+      : res.send({ success: result.success, message: "Email not found" });
   } catch (err) {
     res.status(500).send(err);
   }

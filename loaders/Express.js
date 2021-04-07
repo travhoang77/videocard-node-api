@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const path = require("path");
 const routes = require("../routes");
 const compression = require("compression");
+const exphbs = require("express-handlebars");
 const logger = require("../services/Logger");
 const config = require("../config");
 
@@ -27,6 +28,10 @@ class ExpressLoader {
       })
     );
     app.use(bodyParser.json({ limit: "20mb" }));
+
+    // Handlebars Middleware
+    app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+    app.set("view engine", "handlebars");
 
     //Import Routes
     const authRoutes = require("../routes/routes-template/auth");
