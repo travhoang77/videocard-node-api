@@ -76,7 +76,10 @@ async function checkEmailExists(req, res) {
     console.log(req.params.email);
     const result = await UserServiceInstance.findByEmail(req.params.email);
     return result.success
-      ? res.send({ success: result.success, message: "Email exists" })
+      ? res.send({
+          success: result.success,
+          message: "Email has already been registered",
+        })
       : res.send({ success: result.success, message: "Email not found" });
   } catch (err) {
     res.status(500).send(err);

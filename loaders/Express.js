@@ -7,6 +7,7 @@ const compression = require("compression");
 const exphbs = require("express-handlebars");
 const logger = require("../services/Logger");
 const config = require("../config");
+const cors = require("cors");
 
 class ExpressLoader {
   constructor() {
@@ -27,6 +28,7 @@ class ExpressLoader {
         limit: "20mb",
       })
     );
+    app.use(cors());
     app.use(bodyParser.json({ limit: "20mb" }));
 
     // Handlebars Middleware
