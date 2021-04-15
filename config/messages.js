@@ -13,5 +13,7 @@ module.exports = {
     statusNotProvided: "Valid status not provided",
     userNotProvided: "Valid user not provided",
     appTokenInvalid: "appToken is invalid",
+    authorizationNotProvided: "authorization not provided",
+    authorizationInvalid: "authorization is invalid,",
   },
 };

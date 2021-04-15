@@ -1,5 +1,6 @@
 const UserService = require("../../services/UserService");
 const UserServiceInstance = new UserService();
+const logger = require("../../services/Logger");
 const { findById } = require("../../models/User");
 const { pick, remove } = require("lodash");
 const bcrpyt = require("bcrypt");
@@ -22,6 +23,7 @@ module.exports = {
  * @param  {} res
  */
 async function createUser(req, res) {
+  logger.info(`${req.method}-${req.originalUrl}-createUsers-${req.body}`);
   try {
     const salt = await bcrpyt.genSaltSync(10);
     req.body.password = await bcrpyt.hashSync(req.body.password, salt);
@@ -37,6 +39,7 @@ async function createUser(req, res) {
 }
 
 async function getUsers(req, res) {
+  logger.info(`${req.method}-${req.originalUrl}-getUsers`);
   try {
     const users = await UserServiceInstance.get();
     let results = { success: true, body: [] };
@@ -50,6 +53,7 @@ async function getUsers(req, res) {
 }
 
 async function getUserById(req, res) {
+  logger.info(`${req.method}-${req.originalUrl}-getUsersById:${req.params.id}`);
   try {
     const result = await UserServiceInstance.find(req.params.id);
     return result.success
@@ -61,8 +65,11 @@ async function getUserById(req, res) {
 }
 
 async function getUserByEmail(req, res) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-getUserByEmail:${req.params.email}`
+  );
   try {
-    const result = await UserServiceInstance.findByEmail(req.body.email);
+    const result = await UserServiceInstance.findByEmail(req.params.email);
     return result.success
       ? res.send({ success: result.success, body: omitPassword(result.body) })
       : res.send(user);

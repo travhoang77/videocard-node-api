@@ -5,6 +5,7 @@ const {
   createUser,
   getUsers,
   getUserById,
+  getUserByEmail,
   deleteUserById,
 } = require("../../controllers/User/index");
 
@@ -16,6 +17,10 @@ router.get("/", validateToken, (req, res) => {
 
 router.get("/:id", validateToken, (req, res) => {
   getUserById(req, res);
+});
+
+router.get("/email/:email", validateToken, (req, res) => {
+  getUserByEmail(req, res);
 });
 
 router.post("/", (req, res) => {

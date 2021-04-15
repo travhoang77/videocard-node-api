@@ -1,5 +1,6 @@
 const express = require("express");
 const asyncHandler = require("../../middlewares/async");
+const logger = require("../../services/Logger");
 
 let router = express.Router();
 

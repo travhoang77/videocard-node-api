@@ -28,7 +28,7 @@ class ExpressLoader {
         limit: "20mb",
       })
     );
-    app.use(cors());
+    app.use(cors({ exposedHeaders: "Authorization" }));
     app.use(bodyParser.json({ limit: "20mb" }));
 
     // Handlebars Middleware

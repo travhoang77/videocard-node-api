@@ -4,6 +4,7 @@ const Messages = require("../config/messages");
 const resUtil = require("./response");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
+const logger = require("../services/Logger");
 
 module.exports = { validateToken };
 
@@ -15,6 +16,9 @@ module.exports = { validateToken };
  * @returns {*}
  */
 async function validateToken(req, res, next) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-authorization:${req.headers.authorization}`
+  );
   const token =
     req.headers && req.headers.authorization !== undefined
       ? req.headers.authorization
@@ -25,14 +29,14 @@ async function validateToken(req, res, next) {
     if (!validToken) {
       return res
         .status(401)
-        .send(resUtil.sendError(Messages.responses.appTokenInvalid));
+        .send(resUtil.sendError(Messages.responses.authorizationInvalid));
     }
     req.token = token;
     next();
   } else {
     return res
       .status(400)
-      .send(resUtil.sendError(Messages.responses.appTokenNotProvided));
+      .send(resUtil.sendError(Messages.responses.authorizationNotProvided));
   }
 }
 
