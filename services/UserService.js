@@ -81,7 +81,7 @@ class UserService {
   }
 
   #createPayload = (user) => {
-    user = _.pick(user, ["_id", "email"]);
+    user = _.pick(user, ["_id", "email", "firstname"]);
     user.timestamp = Date.now();
     return user;
   };
