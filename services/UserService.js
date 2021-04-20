@@ -55,9 +55,7 @@ class UserService {
    * @return success value and result
    */
   update(id, user) {
-    console.log(`_id: ${id} user-->`, user);
     const result = asyncHandler(this.MongooseServiceInstance.update(id, user));
-    console.log("---update--result-->", result);
     return result;
   }
   /**
