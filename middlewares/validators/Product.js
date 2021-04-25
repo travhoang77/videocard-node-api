@@ -13,6 +13,8 @@ const validator = Joi.object({
 
   brand: Joi.string().alphanum().max(30),
 
+  features: Joi.array().items(Joi.string()),
+
   quantity: Joi.number()
     .integer()
     .min(0)
@@ -20,7 +22,13 @@ const validator = Joi.object({
 
   price: Joi.number().min(0),
 
-  imgUrl: Joi.string(),
+  images: Joi.array().items(
+    Joi.object().keys({
+      url: Joi.string().required(),
+      type: Joi.string().alphanum().max(30).required(),
+      description: Joi.string().allow(null, ""),
+    })
+  ),
 
   rating: Joi.number()
     .min(0)
