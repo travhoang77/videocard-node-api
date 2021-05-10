@@ -27,6 +27,16 @@ class ProductService {
     const results = asyncHandler(this.MongooseServiceInstance.find());
     return results;
   }
+  
+  /**
+   * @param  {} chipset
+   *return results
+   */
+  getBy(chipset) {
+    const results = asyncHandler(this.MongooseServiceInstance.find({chipset: chipset}));
+    console.log(results);
+    return results;
+  }
   /**
    * @param  {} product
    * update exisiting product in DB

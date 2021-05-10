@@ -2,7 +2,10 @@ const ProductService = require("../../services/ProductService");
 const ProductServiceInstance = new ProductService();
 const logger = require("../../services/Logger");
 
-module.exports = { createProduct, getProducts };
+const url = require("url");
+const querystring = require("querystring");
+
+module.exports = { createProduct, getProducts, getProductsByChipset };
 
 async function createProduct(req, res) {
   logger.info(
@@ -27,3 +30,24 @@ async function getProducts(req, res) {
     res.status(500).send(err);
   }
 }
+
+async function getProductsByChipset(req, res) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-getProductsByChipset ${req.query.chipset}`
+  );
+  try {
+    const query = url.parse(req.url, true).query;
+    const products = await ProductServiceInstance.getBy(query["chipset"]);
+    return res.send(products);
+  } catch (err) {
+    res.statue(500).send(err);
+  }
+}
+// try {
+//   const products = await ProductServiceInstance.getProductsByChipset(
+//     req.query.chipset
+//   );
+//   return res.send(products);
+// } catch (err) {
+//   res.status(500).send(err);
+// }
