@@ -32,13 +32,13 @@ router.get("/:id", (req, res) => {
 router.post("/", validateToken, (req, res) => {
   createProduct(req, res);
 });
+// Commenting out PUT and DELETE Product until User Roles are defined
+// router.put("/:id", validateToken, (req, res) => {
+//   updateProduct(req, res);
+// });
 
-router.put("/:id", validateToken, (req, res) => {
-  updateProduct(req, res);
-});
-
-router.delete("/:id", validateToken, (req, res) => {
-  deleteProduct(req, res);
-});
+// router.delete("/:id", validateToken, (req, res) => {
+//   deleteProduct(req, res);
+// });
 
 module.exports = router;

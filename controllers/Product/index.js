@@ -10,9 +10,8 @@ module.exports = {
   getProducts,
   getProductById,
   getProductsByChipset,
-  // Commenting out update and delete until user roles are defined.
-  // updateProduct,
-  // deleteProduct,
+  updateProduct,
+  deleteProduct,
 };
 
 async function createProduct(req, res) {
