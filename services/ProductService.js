@@ -34,7 +34,6 @@ class ProductService {
    */
   getBy(chipset) {
     const results = asyncHandler(this.MongooseServiceInstance.find({chipset: chipset}));
-    console.log(results);
     return results;
   }
   /**

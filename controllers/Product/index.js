@@ -44,7 +44,7 @@ async function getProductById(req, res) {
   );
   try {
     const product = await ProductServiceInstance.find(req.params.id);
-    return res.send(product);
+    return product.success ? res.send(product) : res.status(404).send(product);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -57,7 +57,9 @@ async function getProductsByChipset(req, res) {
   try {
     const query = url.parse(req.url, true).query;
     const products = await ProductServiceInstance.getBy(query["chipset"]);
-    return res.send(products);
+    return products.success && products.body.length > 0
+      ? res.send(products)
+      : res.status(404).send(products);
   } catch (err) {
     res.status(500).send(err);
   }
