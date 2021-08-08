@@ -13,6 +13,7 @@ module.exports = {
   getUserById,
   getUserByEmail,
   checkEmailExists,
+  validatePassword,
   authenticate,
   deleteUserById,
   logOff,
@@ -80,7 +81,9 @@ async function getUserByEmail(req, res) {
 
 async function checkEmailExists(req, res) {
   try {
-    console.log(req.params.email);
+    logger.info(
+      `${req.method}-${req.originalUrl}-checkEmailExistsc:${req.params.email}`
+    );
     const result = await UserServiceInstance.findByEmail(req.params.email);
     return result.success
       ? res.send({
@@ -93,7 +96,33 @@ async function checkEmailExists(req, res) {
   }
 }
 
+async function validatePassword(req, res) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-validatePassword:${req.body.id}`
+  );
+  try {
+    const result = await UserServiceInstance.find(req.body.id);
+    if (result.success) {
+      const validated = await bcrpyt.compareSync(
+        req.body.password,
+        result.body.password
+      );
+      return validated
+        ? res.send({ success: true, message: "Valid Password" })
+        : res.send({ success: false, message: "Invalid Password" });
+    } else
+      return res
+        .status(404)
+        .send({ success: false, message: "Invalid User id" });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
 async function authenticate(req, res) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-authenticate:${req.body.email}`
+  );
   try {
     const result = await UserServiceInstance.findByEmail(req.body.email);
 
