@@ -9,19 +9,19 @@ const {
 
 let router = express.Router();
 
-router.post("/", (req, res) => {
+router.post("/authenticate", (req, res) => {
   authenticate(req, res);
 });
 
-router.get("/:email", (req, res) => {
+router.get("/doesEmailExists/:email", (req, res) => {
   checkEmailExists(req, res);
 });
 
-router.post("/validatepassword", validateToken, (req, res) => {
+router.post("/validatePassword", validateToken, (req, res) => {
   validatePassword(req, res);
 });
 
-router.post("/signout", validateToken, (req, res) => {
+router.post("/signOut", validateToken, (req, res) => {
   logOff(req, res);
 });
 

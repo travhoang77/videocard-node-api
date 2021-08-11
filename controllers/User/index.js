@@ -14,6 +14,7 @@ module.exports = {
   getUserByEmail,
   checkEmailExists,
   validatePassword,
+  updatePassword,
   authenticate,
   deleteUserById,
   logOff,
@@ -114,6 +115,30 @@ async function validatePassword(req, res) {
       return res
         .status(404)
         .send({ success: false, message: "Invalid User id" });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+async function updatePassword(req, res) {
+  logger.info(`${req.method}-${req.originalUrl}-updatePassword:${req.body.id}`);
+
+  try {
+    console.log(req.body.id);
+    const result = await UserServiceInstance.find(req.body.id);
+    console.log(req.body.id);
+    if (result.success) {
+      const salt = await bcrpyt.genSaltSync(10);
+      result.body.password = await bcrpyt.hashSync(req.body.password, salt);
+      const updatedresult = await UserServiceInstance.update(
+        req.body.id,
+        result.body
+      );
+
+      updatedresult.success
+        ? res.send({ success: true, message: "Password successfully updated" })
+        : res.send({ success: false, message: "Password update failed" });
+    } else res.send({ success: false, message: "Invalid User id" });
   } catch (err) {
     res.status(500).send(err);
   }
