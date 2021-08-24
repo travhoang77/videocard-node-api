@@ -2,9 +2,16 @@ const UserService = require("../../services/UserService");
 const UserServiceInstance = new UserService();
 const logger = require("../../services/Logger");
 const { findById } = require("../../models/User");
-const { pick, remove } = require("lodash");
+const _ = require("lodash");
 const bcrpyt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const {
+  removeItemOnce,
+  updateObject,
+  omitPassword,
+  valueExists,
+  moveItemToFront,
+} = require("../../util/ObjectUtil");
 const config = require("../../config");
 
 module.exports = {
@@ -18,6 +25,11 @@ module.exports = {
   authenticate,
   deleteUserById,
   logOff,
+  listAddresses,
+  createAddress,
+  deleteAddressById,
+  updateAddressById,
+  setPrimaryAddressById,
 };
 
 /**
@@ -212,30 +224,208 @@ async function logOff(req, res) {
           success: updated_result.success,
           body: omitPassword(updated_result.body),
         })
-      : res.send(update_result);
+      : res.send(updated_result);
   } catch (err) {
     res.status(500).send(err);
   }
 }
 
-function removeItemOnce(arr, value) {
-  var index = arr.indexOf(value);
-  if (index > -1) {
-    arr.splice(index, 1);
+async function listAddresses(req, res) {
+  logger.info(`${req.method}-${req.originalUrl}-listAddresses-`);
+  try {
+    const token =
+      req.headers && req.headers.authorization !== undefined
+        ? req.headers.authorization
+        : req.query.appToken || req.params.appToken || req.body.appToken;
+
+    const decode = jwt.verify(token, config.secret);
+
+    const result = await UserServiceInstance.find(decode._id);
+
+    res.send({ success: true, addresses: result.body.addresses });
+  } catch (err) {
+    res.status(500).send(err);
   }
-  return arr;
 }
 
-function omitPassword(user) {
-  user = pick(user, [
-    "email",
-    "firstname",
-    "lastname",
-    "date",
-    "access_tokens",
-    "birth_year",
-    "_id",
-    "__v",
-  ]);
-  return user;
+async function createAddress(req, res) {
+  logger.info(`${req.method}-${req.originalUrl}-createAddress-${req.body}`);
+  try {
+    const token =
+      req.headers && req.headers.authorization !== undefined
+        ? req.headers.authorization
+        : req.query.appToken || req.params.appToken || req.body.appToken;
+
+    const decode = jwt.verify(token, config.secret);
+
+    const result = await UserServiceInstance.find(decode._id);
+
+    result.body.addresses !== null
+      ? result.body.addresses.push(req.body)
+      : (result.body.addresses = [req.body]);
+
+    const updated_result = await UserServiceInstance.update(
+      decode._id,
+      result.body
+    );
+
+    updated_result.success
+      ? res.send({
+          success: updated_result.success,
+          body: omitPassword(updated_result.body),
+        })
+      : res.send({
+          success: updated_result.success,
+          message: "Address could not be created",
+        });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+async function deleteAddressById(req, res) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-deleteAddressBy-${req.params.id}`
+  );
+  try {
+    const token =
+      req.headers && req.headers.authorization !== undefined
+        ? req.headers.authorization
+        : req.query.appToken || req.params.appToken || req.body.appToken;
+
+    const decode = jwt.verify(token, config.secret);
+
+    const result = await UserServiceInstance.find(decode._id);
+
+    addressIsNullorEmpty(result.body.addresses, req, res);
+
+    const removed = _.remove(result.body.addresses, function (n) {
+      return n._id == req.params.id;
+    });
+
+    if (_.isEmpty(removed))
+      res.status(404).send({ success: false, message: "Address not found" });
+
+    const updated_result = await UserServiceInstance.update(
+      decode._id,
+      result.body
+    );
+
+    updated_result.success
+      ? res.send({
+          success: updated_result.success,
+          address: removed,
+        })
+      : res.send({
+          success: updated_result.success,
+          message: "Address could not be removed",
+        });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+async function updateAddressById(req, res) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-updateAddressBy-${req.params.id}`
+  );
+  try {
+    const token =
+      req.headers && req.headers.authorization !== undefined
+        ? req.headers.authorization
+        : req.query.appToken || req.params.appToken || req.body.appToken;
+
+    const decode = jwt.verify(token, config.secret);
+
+    const result = await UserServiceInstance.find(decode._id);
+
+    addressIsNullorEmpty(result.body.addresses, req, res);
+
+    const index = result.body.addresses.findIndex(
+      (x) => x._id == req.params.id
+    );
+
+    if (index === -1)
+      res.status(404).send({ success: false, message: "Address not found" });
+
+    const updated = updateObject(result.body.addresses[index], req.body);
+
+    result.body.addresses[index] = updated;
+
+    const updated_result = await UserServiceInstance.update(
+      decode._id,
+      result.body
+    );
+
+    updated_result.success
+      ? res.send({
+          success: updated_result.success,
+          address: updated_result.body.addresses[index],
+        })
+      : res.send({
+          success: updated_result.success,
+          message: "Address could not be updated",
+        });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+//First address is always the primary address
+async function setPrimaryAddressById(req, res) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-setPrimaryAddressById-${req.params.id}`
+  );
+  try {
+    const token =
+      req.headers && req.headers.authorization !== undefined
+        ? req.headers.authorization
+        : req.query.appToken || req.params.appToken || req.body.appToken;
+
+    const decode = jwt.verify(token, config.secret);
+
+    const result = await UserServiceInstance.find(decode._id);
+
+    addressIsNullorEmpty(result.body.addresses, req, res);
+
+    if (
+      valueExists("_id", req.params.id, result.body.addresses) === undefined
+    ) {
+      res.status(404).send({
+        success: false,
+        message: "Address does not exist",
+      });
+    }
+
+    if (result.body.addresses.length > 1) {
+      moveItemToFront("_id", req.params.id, result.body.addresses);
+
+      const updated_result = await UserServiceInstance.update(
+        decode._id,
+        result.body
+      );
+
+      updated_result
+        ? res.send({
+            success: updated_result.success,
+            address: updated_result.body.addresses[0],
+          })
+        : res.send({
+            success: updated_result.success,
+            message: "Primary address could not be set",
+          });
+    } else
+      res.send({
+        success: false,
+        message:
+          "There is only one address and it is already the primary address",
+      });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+function addressIsNullorEmpty(addresses, req, res) {
+  if (_.isNull(addresses) || _.isEmpty(addresses))
+    res.status(404).send({ success: false, message: "Address not found" });
 }

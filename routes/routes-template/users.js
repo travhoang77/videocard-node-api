@@ -1,5 +1,6 @@
 const express = require("express");
 const { validateToken } = require("../../middlewares/token");
+const { rejectObId } = require("../../middlewares/badrequest");
 
 const {
   createUser,
@@ -8,6 +9,11 @@ const {
   getUserByEmail,
   deleteUserById,
   updatePassword,
+  createAddress,
+  deleteAddressById,
+  updateAddressById,
+  listAddresses,
+  setPrimaryAddressById,
 } = require("../../controllers/User/index");
 
 let router = express.Router();
@@ -34,6 +40,31 @@ router.post("/updatePassword", validateToken, (req, res) => {
 
 router.delete("/deleteUser/:id", validateToken, (req, res) => {
   deleteUserById(req, res);
+});
+
+router.get("/address/listAddresses", validateToken, (req, res) => {
+  listAddresses(req, res);
+});
+
+router.post("/address/createAddress", validateToken, (req, res) => {
+  createAddress(req, res);
+});
+
+router.delete("/address/deleteAddressById/:id", validateToken, (req, res) => {
+  deleteAddressById(req, res);
+});
+
+router.put(
+  "/address/updateAddressById/:id",
+  validateToken,
+  rejectObId,
+  (req, res) => {
+    updateAddressById(req, res);
+  }
+);
+
+router.put("/address/setPrimaryAddressById/:id", validateToken, (req, res) => {
+  setPrimaryAddressById(req, res);
 });
 
 module.exports = router;

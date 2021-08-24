@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const Address = require("./Address");
 
 const validator = Joi.object({
   email: Joi.string()
@@ -22,6 +23,8 @@ const validator = Joi.object({
     .max(new Date(Date.now()).getFullYear()),
 
   date: Joi.date().meta({ _mongoose: { default: Date.now } }),
+
+  addresses: Joi.array().items(Address.validator),
 });
 
 exports.validator = validator;
