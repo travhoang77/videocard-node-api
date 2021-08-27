@@ -11,7 +11,7 @@ function updateObject(oldObj, newObj) {
 }
 
 function valueExists(prop, value, data) {
-  return data.find((x) => x[prop] == value);
+  return data.find((x) => x[prop] === value);
 }
 
 function removeItemOnce(arr, value) {
