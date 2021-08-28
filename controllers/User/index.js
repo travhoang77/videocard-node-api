@@ -233,14 +233,8 @@ async function logOff(req, res) {
 async function listAddresses(req, res) {
   logger.info(`${req.method}-${req.originalUrl}-listAddresses-`);
   try {
-    const token =
-      req.headers && req.headers.authorization !== undefined
-        ? req.headers.authorization
-        : req.query.appToken || req.params.appToken || req.body.appToken;
-
-    const decode = jwt.verify(token, config.secret);
-
-    const result = await UserServiceInstance.find(decode._id);
+    const id = req.params.id;
+    const result = await UserServiceInstance.find(id);
 
     res.send({ success: true, addresses: result.body.addresses });
   } catch (err) {

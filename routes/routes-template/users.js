@@ -42,7 +42,7 @@ router.delete("/deleteUser/:id", validateToken, (req, res) => {
   deleteUserById(req, res);
 });
 
-router.get("/address/getAddresses", validateToken, (req, res) => {
+router.get("/address/getAddressesByUserId/:id", validateToken, (req, res) => {
   listAddresses(req, res);
 });
 
