@@ -42,15 +42,16 @@ router.delete("/deleteUser/:id", validateToken, (req, res) => {
   deleteUserById(req, res);
 });
 
-router.get("/address/getAddressesByUserId/:id", validateToken, (req, res) => {
+router.get("/:id/getAddresses", validateToken, (req, res) => {
   listAddresses(req, res);
 });
 
-router.post("/address/createAddress", validateToken, (req, res) => {
+router.post("/:id/createAddress", validateToken, (req, res) => {
   createAddress(req, res);
 });
 
-router.delete("/address/deleteAddressById/:id", validateToken, (req, res) => {
+router.delete("/:userid/deleteAddressById/:id", validateToken, (req, res) => {
+  console.log(req.params.userid);
   deleteAddressById(req, res);
 });
 

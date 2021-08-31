@@ -245,21 +245,13 @@ async function listAddresses(req, res) {
 async function createAddress(req, res) {
   logger.info(`${req.method}-${req.originalUrl}-createAddress-${req.body}`);
   try {
-    const token =
-      req.headers && req.headers.authorization !== undefined
-        ? req.headers.authorization
-        : req.query.appToken || req.params.appToken || req.body.appToken;
-
-    const decode = jwt.verify(token, config.secret);
-
-    const result = await UserServiceInstance.find(decode._id);
-
-    result.body.addresses !== null
+    const result = await UserServiceInstance.find(req.params.id);
+    result.body.addresses !== undefined
       ? result.body.addresses.push(req.body)
       : (result.body.addresses = [req.body]);
 
     const updated_result = await UserServiceInstance.update(
-      decode._id,
+      req.params.id,
       result.body
     );
 
@@ -282,14 +274,7 @@ async function deleteAddressById(req, res) {
     `${req.method}-${req.originalUrl}-deleteAddressBy-${req.params.id}`
   );
   try {
-    const token =
-      req.headers && req.headers.authorization !== undefined
-        ? req.headers.authorization
-        : req.query.appToken || req.params.appToken || req.body.appToken;
-
-    const decode = jwt.verify(token, config.secret);
-
-    const result = await UserServiceInstance.find(decode._id);
+    const result = await UserServiceInstance.find(req.params.userid);
 
     addressIsNullorEmpty(result.body.addresses, req, res);
 
@@ -301,7 +286,7 @@ async function deleteAddressById(req, res) {
       res.status(404).send({ success: false, message: "Address not found" });
 
     const updated_result = await UserServiceInstance.update(
-      decode._id,
+      req.params.userid,
       result.body
     );
 
@@ -321,17 +306,10 @@ async function deleteAddressById(req, res) {
 
 async function updateAddressById(req, res) {
   logger.info(
-    `${req.method}-${req.originalUrl}-updateAddressBy-${req.params.id}`
+    `${req.method}-${req.originalUrl}-updateAddressById-${req.params.id}`
   );
   try {
-    const token =
-      req.headers && req.headers.authorization !== undefined
-        ? req.headers.authorization
-        : req.query.appToken || req.params.appToken || req.body.appToken;
-
-    const decode = jwt.verify(token, config.secret);
-
-    const result = await UserServiceInstance.find(decode._id);
+    const result = await UserServiceInstance.find(req.params.userid);
 
     addressIsNullorEmpty(result.body.addresses, req, res);
 
@@ -347,7 +325,7 @@ async function updateAddressById(req, res) {
     result.body.addresses[index] = updated;
 
     const updated_result = await UserServiceInstance.update(
-      decode._id,
+      req.params.userid,
       result.body
     );
 
@@ -371,14 +349,7 @@ async function setPrimaryAddressById(req, res) {
     `${req.method}-${req.originalUrl}-setPrimaryAddressById-${req.params.id}`
   );
   try {
-    const token =
-      req.headers && req.headers.authorization !== undefined
-        ? req.headers.authorization
-        : req.query.appToken || req.params.appToken || req.body.appToken;
-
-    const decode = jwt.verify(token, config.secret);
-
-    const result = await UserServiceInstance.find(decode._id);
+    const result = await UserServiceInstance.find(req.params.userid);
 
     addressIsNullorEmpty(result.body.addresses, req, res);
 
@@ -395,7 +366,7 @@ async function setPrimaryAddressById(req, res) {
       moveItemToFront("_id", req.params.id, result.body.addresses);
 
       const updated_result = await UserServiceInstance.update(
-        decode._id,
+        req.params.userid,
         result.body
       );
 
