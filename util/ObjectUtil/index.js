@@ -1,3 +1,4 @@
+const { array } = require("joi");
 const _ = require("lodash");
 
 function updateObject(oldObj, newObj) {
@@ -8,10 +9,6 @@ function updateObject(oldObj, newObj) {
   });
 
   return oldObj;
-}
-
-function valueExists(prop, value, data) {
-  return data.find((x) => x[prop] === value);
 }
 
 function removeItemOnce(arr, value) {
@@ -47,6 +44,5 @@ module.exports = {
   removeItemOnce,
   omitPassword,
   updateObject,
-  valueExists,
   moveItemToFront,
 };

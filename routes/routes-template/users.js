@@ -14,6 +14,7 @@ const {
   updateAddressById,
   listAddresses,
   setPrimaryAddressById,
+  setDefaultShippingAddressById,
 } = require("../../controllers/User/index");
 
 let router = express.Router();
@@ -51,12 +52,11 @@ router.post("/:id/createAddress", validateToken, (req, res) => {
 });
 
 router.delete("/:userid/deleteAddressById/:id", validateToken, (req, res) => {
-  console.log(req.params.userid);
   deleteAddressById(req, res);
 });
 
 router.put(
-  "/address/updateAddressById/:id",
+  "/:userid/updateAddressById/:id",
   validateToken,
   rejectObId,
   (req, res) => {
@@ -64,8 +64,16 @@ router.put(
   }
 );
 
-router.put("/address/setPrimaryAddressById/:id", validateToken, (req, res) => {
+router.put("/:userid/setPrimaryAddressById/:id", validateToken, (req, res) => {
   setPrimaryAddressById(req, res);
 });
+
+router.put(
+  "/:userid/setDefaultShippingAddressById/:id",
+  validateToken,
+  (req, res) => {
+    setDefaultShippingAddressById(req, res);
+  }
+);
 
 module.exports = router;

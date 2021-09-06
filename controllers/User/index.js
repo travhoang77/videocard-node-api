@@ -9,7 +9,6 @@ const {
   removeItemOnce,
   updateObject,
   omitPassword,
-  valueExists,
   moveItemToFront,
 } = require("../../util/ObjectUtil");
 const config = require("../../config");
@@ -30,6 +29,7 @@ module.exports = {
   deleteAddressById,
   updateAddressById,
   setPrimaryAddressById,
+  setDefaultShippingAddressById,
 };
 
 /**
@@ -258,7 +258,7 @@ async function createAddress(req, res) {
     updated_result.success
       ? res.send({
           success: updated_result.success,
-          body: omitPassword(updated_result.body),
+          addresses: updated_result.body.addresses,
         })
       : res.send({
           success: updated_result.success,
@@ -276,7 +276,7 @@ async function deleteAddressById(req, res) {
   try {
     const result = await UserServiceInstance.find(req.params.userid);
 
-    addressIsNullorEmpty(result.body.addresses, req, res);
+    addressesAreNullorEmpty(result.body.addresses, req, res);
 
     const removed = _.remove(result.body.addresses, function (n) {
       return n._id == req.params.id;
@@ -293,7 +293,7 @@ async function deleteAddressById(req, res) {
     updated_result.success
       ? res.send({
           success: updated_result.success,
-          address: removed,
+          addresses: updated_result.body.addresses,
         })
       : res.send({
           success: updated_result.success,
@@ -311,7 +311,7 @@ async function updateAddressById(req, res) {
   try {
     const result = await UserServiceInstance.find(req.params.userid);
 
-    addressIsNullorEmpty(result.body.addresses, req, res);
+    addressesAreNullorEmpty(result.body.addresses, req, res);
 
     const index = result.body.addresses.findIndex(
       (x) => x._id == req.params.id
@@ -351,16 +351,14 @@ async function setPrimaryAddressById(req, res) {
   try {
     const result = await UserServiceInstance.find(req.params.userid);
 
-    addressIsNullorEmpty(result.body.addresses, req, res);
+    addressesAreNullorEmpty(result.body.addresses, req, res);
 
-    if (
-      valueExists("_id", req.params.id, result.body.addresses) === undefined
-    ) {
-      res.status(404).send({
-        success: false,
-        message: "Address does not exist",
-      });
-    }
+    const index = result.body.addresses.findIndex(
+      (x) => x._id == req.params.id
+    );
+
+    if (index === -1)
+      res.status(404).send({ success: false, message: "Address not found" });
 
     if (result.body.addresses.length > 1) {
       moveItemToFront("_id", req.params.id, result.body.addresses);
@@ -373,7 +371,7 @@ async function setPrimaryAddressById(req, res) {
       updated_result
         ? res.send({
             success: updated_result.success,
-            address: updated_result.body.addresses[0],
+            addresses: updated_result.body.addresses,
           })
         : res.send({
             success: updated_result.success,
@@ -390,7 +388,52 @@ async function setPrimaryAddressById(req, res) {
   }
 }
 
-function addressIsNullorEmpty(addresses, req, res) {
+async function setDefaultShippingAddressById(req, res) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-setDefaultShippingAddressById-${req.params.id}`
+  );
+  try {
+    const result = await UserServiceInstance.find(req.params.userid);
+
+    addressesAreNullorEmpty(result.body.addresses, req, res);
+    const index = result.body.addresses.findIndex(
+      (x) => x._id == req.params.id
+    );
+
+    if (index === -1 || index === 0)
+      res.status(404).send({ success: false, message: "Address not found" });
+
+    if (index === 1)
+      res.send({
+        success: false,
+        message:
+          "There is only one shipping address and it is already the default shipping address",
+      });
+
+    const subarray = result.body.addresses.slice(1);
+    moveItemToFront("_id", req.params.id, subarray);
+    result.body.addresses = [result.body.addresses[0]].concat(subarray);
+
+    const updated_result = await UserServiceInstance.update(
+      req.params.userid,
+      result.body
+    );
+
+    updated_result
+      ? res.send({
+          success: updated_result.success,
+          addresses: updated_result.body.addresses,
+        })
+      : res.send({
+          success: updated_result.success,
+          message: "Default shipping address could not be set",
+        });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+function addressesAreNullorEmpty(addresses, req, res) {
   if (_.isNull(addresses) || _.isEmpty(addresses))
     res.status(404).send({ success: false, message: "Address not found" });
 }
