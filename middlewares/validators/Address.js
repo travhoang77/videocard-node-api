@@ -14,8 +14,6 @@ const validator = Joi.object({
   state: Joi.string().alphanum().max(30).required(),
 
   zipcode: Joi.string().alphanum().max(30).required(),
-
-  description: Joi.string().alphanum().max(100),
 });
 
 exports.validator = validator;

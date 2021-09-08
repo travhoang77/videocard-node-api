@@ -12,6 +12,7 @@ const {
   moveItemToFront,
 } = require("../../util/ObjectUtil");
 const config = require("../../config");
+const { addColors } = require("winston/lib/winston/config");
 
 module.exports = {
   createUser,
@@ -26,6 +27,7 @@ module.exports = {
   logOff,
   listAddresses,
   createAddress,
+  getAddressById,
   deleteAddressById,
   updateAddressById,
   setPrimaryAddressById,
@@ -237,6 +239,29 @@ async function listAddresses(req, res) {
     const result = await UserServiceInstance.find(id);
 
     res.send({ success: true, addresses: result.body.addresses });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+async function getAddressById(req, res) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-getAddressById-${req.params.addressid}`
+  );
+  try {
+    const result = await UserServiceInstance.find(req.params.id);
+
+    if (!result.success)
+      res.status(404).send({ success: false, message: "User not found" });
+
+    console.log(req.params.addressid);
+    const index = result.body.addresses.findIndex(
+      (x) => x._id == req.params.addressid
+    );
+    if (index === -1)
+      res.status(404).send({ success: false, message: "Address not found" });
+
+    res.send({ success: true, address: result.body.addresses[index] });
   } catch (err) {
     res.status(500).send(err);
   }

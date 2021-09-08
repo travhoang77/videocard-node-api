@@ -10,6 +10,7 @@ const {
   deleteUserById,
   updatePassword,
   createAddress,
+  getAddressById,
   deleteAddressById,
   updateAddressById,
   listAddresses,
@@ -47,6 +48,10 @@ router.get("/:id/getAddresses", validateToken, (req, res) => {
   listAddresses(req, res);
 });
 
+router.get("/:id/getAddressById/:addressid", validateToken, (req, res) => {
+  getAddressById(req, res);
+});
+
 router.post("/:id/createAddress", validateToken, (req, res) => {
   createAddress(req, res);
 });
@@ -55,14 +60,9 @@ router.delete("/:userid/deleteAddressById/:id", validateToken, (req, res) => {
   deleteAddressById(req, res);
 });
 
-router.put(
-  "/:userid/updateAddressById/:id",
-  validateToken,
-  rejectObId,
-  (req, res) => {
-    updateAddressById(req, res);
-  }
-);
+router.put("/:userid/updateAddressById/:id", validateToken, (req, res) => {
+  updateAddressById(req, res);
+});
 
 router.put("/:userid/setPrimaryAddressById/:id", validateToken, (req, res) => {
   setPrimaryAddressById(req, res);
