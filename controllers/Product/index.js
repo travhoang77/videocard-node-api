@@ -22,7 +22,8 @@ async function createProduct(req, res) {
   );
   try {
     const product = await ProductServiceInstance.create(req.body);
-    return res.send(product);
+    if (product.success) res.send(product);
+    else res.status(400).send(product);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -74,7 +75,8 @@ async function updateProduct(req, res) {
       req.params.id,
       req.body
     );
-    return res.send(product);
+    if (product.success) res.send(product);
+    else res.status(400).send(product);
   } catch (err) {
     res.status(500).send(err);
   }

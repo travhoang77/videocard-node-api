@@ -1,17 +1,17 @@
 const Joi = require("joi");
 
 const validator = Joi.object({
-  name: Joi.string().min(3).max(50).required(),
+  name: Joi.string().min(3).max(5000).required(),
 
-  subtitle: Joi.string().max(100),
+  subtitle: Joi.string().max(5000),
 
-  type: Joi.string().alphanum().max(30),
+  type: Joi.string().alphanum().max(100),
 
-  chipset: Joi.string().alphanum().max(30),
+  chipset: Joi.string().max(100),
 
-  maker: Joi.string().alphanum().max(30),
+  maker: Joi.string().alphanum().max(100),
 
-  brand: Joi.string().alphanum().max(30),
+  brand: Joi.string().alphanum().max(100),
 
   features: Joi.array().items(Joi.string()),
 
