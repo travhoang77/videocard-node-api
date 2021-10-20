@@ -8,6 +8,7 @@ const {
   getProducts,
   getProductById,
   getProductsByChipset,
+  getProductsByCategory,
   updateProduct,
   deleteProduct,
 } = require("../../controllers/Product/index");
@@ -21,7 +22,12 @@ router.get("/", (req, res) => {
 
   if (_.isEmpty(query)) getProducts(req, res);
   else {
-    getProductsByChipset(req, res);
+    if (query["chipset"]) {
+      getProductsByChipset(req, res);
+    } else if (query["category"]) {
+      console.log(query["category"]);
+      getProductsByCategory(req, res);
+    }
   }
 });
 

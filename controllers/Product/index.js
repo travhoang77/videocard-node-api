@@ -10,6 +10,7 @@ module.exports = {
   getProducts,
   getProductById,
   getProductsByChipset,
+  getProductsByCategory,
   updateProduct,
   deleteProduct,
 };
@@ -58,6 +59,21 @@ async function getProductsByChipset(req, res) {
   try {
     const query = url.parse(req.url, true).query;
     const products = await ProductServiceInstance.getBy(query["chipset"]);
+    return products.success && products.body.length > 0
+      ? res.send(products)
+      : res.status(404).send(products);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+async function getProductsByCategory(req, res) {
+  logger.info(
+    `${req.method}-${req.originalUrl}-getProductsByCategory ${req.query.tag}`
+  );
+  try {
+    const query = url.parse(req.url, true).query;
+    const products = await ProductServiceInstance.getByTag(query["category"]);
     return products.success && products.body.length > 0
       ? res.send(products)
       : res.status(404).send(products);

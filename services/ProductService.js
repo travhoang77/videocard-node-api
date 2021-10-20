@@ -27,15 +27,28 @@ class ProductService {
     const results = asyncHandler(this.MongooseServiceInstance.find());
     return results;
   }
-  
+
   /**
    * @param  {} chipset
    *return results
    */
   getBy(chipset) {
-    const results = asyncHandler(this.MongooseServiceInstance.find({chipset: chipset}));
+    const results = asyncHandler(
+      this.MongooseServiceInstance.find({ chipset: chipset })
+    );
     return results;
   }
+  /**
+   * @param  {} chipset
+   *return results
+   */
+  getByTag(tag) {
+    const results = asyncHandler(
+      this.MongooseServiceInstance.find({ tags: { $all: [`${tag}`] } })
+    );
+    return results;
+  }
+
   /**
    * @param  {} product
    * update exisiting product in DB
